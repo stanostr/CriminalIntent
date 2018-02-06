@@ -42,6 +42,7 @@ public class CrimeFragment extends Fragment {
     private Button mDateButton;
     private Button mTimeButton;
     private CheckBox mSolvedCheckBox;
+    private Button mReportButton;
 
     public static CrimeFragment newInstance(UUID crimeId)
     {
@@ -66,18 +67,6 @@ public class CrimeFragment extends Fragment {
     {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_crime, menu);
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        CrimeLab.get(getActivity()).updateCrime(mCrime);
-        //// FIXME: 2/4/2018 dirty fix to avoid getting empty nameless crimes
-        if(mCrime.getTitle()==null||mCrime.getTitle()=="")
-        {
-            CrimeLab.get(getActivity()).deleteCrime(mCrime);
-        }
     }
 
     @Override
@@ -137,6 +126,15 @@ public class CrimeFragment extends Fragment {
                 mCrime.setSolved(isChecked);
             }
         });
+
+        mReportButton = v.findViewById(R.id.crime_report);
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+
+            }
+        });
         return v;
     }
 
@@ -158,6 +156,18 @@ public class CrimeFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             mCrime.setDate(date);
             updateTime();
+        }
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        //// FIXME: 2/4/2018 dirty fix to avoid getting empty nameless crimes
+        if(mCrime.getTitle()==null||mCrime.getTitle()=="")
+        {
+            CrimeLab.get(getActivity()).deleteCrime(mCrime);
         }
     }
 
