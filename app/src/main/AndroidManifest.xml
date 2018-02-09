@@ -18,6 +18,7 @@
         <activity android:name=".CrimePagerActivity"
             android:label="@string/app_name"
             android:parentActivityName=".CrimeListActivity"/>
+        <uses-permission android:name="android.permission.READ_CONTACTS"/>
     </application>
 
 </manifest>
