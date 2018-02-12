@@ -29,4 +29,5 @@
     <string name="send_report">Send crime report via</string>
     <string name="call_suspect_text">Call suspect</string>
     <string name="call_suspect">Call suspect via</string>
+    <string name="phone_error">Error getting suspect\'s phone number.</string>
 </resources>

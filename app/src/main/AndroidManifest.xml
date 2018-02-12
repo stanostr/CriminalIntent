@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stanislavveliky.criminalintent" >
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+                     android:maxSdkVersion="18"/>
+    <uses-feature android:name="android.hardware.camera2"
+        android:required="false"/>
 
     <application
         android:allowBackup="true"
@@ -18,7 +23,6 @@
         <activity android:name=".CrimePagerActivity"
             android:label="@string/app_name"
             android:parentActivityName=".CrimeListActivity"/>
-        <uses-permission android:name="android.permission.READ_CONTACTS"/>
     </application>
 
 </manifest>

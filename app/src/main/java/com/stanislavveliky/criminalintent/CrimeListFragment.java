@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,6 +44,7 @@ public class CrimeListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        registerForContextMenu(mCrimeRecyclerView);
         if(savedInstanceState!=null) {
             mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
         }
@@ -112,7 +114,6 @@ public class CrimeListFragment extends Fragment {
         activity.getSupportActionBar().setSubtitle(subtitle);
     }
 
-
     public void updateUI()
     {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
@@ -129,7 +130,8 @@ public class CrimeListFragment extends Fragment {
         updateSubtitle();
     }
 
-    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener
+    {
         private TextView mTitleTextView;
         private TextView mDateTextView;
         private CheckBox mSolvedCheckBox;
@@ -157,6 +159,7 @@ public class CrimeListFragment extends Fragment {
             Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivity(intent);
         }
+
     }
 
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>
@@ -193,4 +196,6 @@ public class CrimeListFragment extends Fragment {
             mCrimes = crimes;
         }
     }
+
+
 }
