@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -49,6 +51,7 @@ public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
+    private static final String DIALOG_PHOTO = "DialogPhoto";
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
@@ -190,12 +193,14 @@ public class CrimeFragment extends Fragment {
 
         mPhotoButton = v.findViewById(R.id.crime_camera);
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        captureImage.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         boolean canTakePhoto = (mPhotoFile != null) &&
                 (captureImage.resolveActivity(packageManager) != null);
 
         if(canTakePhoto)
         {
-            Uri uri = Uri.fromFile(mPhotoFile);
+            Uri uri = FileProvider.getUriForFile(getActivity(),
+                    BuildConfig.APPLICATION_ID + ".provider", mPhotoFile);
             captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         }
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
@@ -206,7 +211,27 @@ public class CrimeFragment extends Fragment {
         });
 
         mPhotoView = v.findViewById(R.id.crime_photo);
+        ViewTreeObserver observer = mPhotoView.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int height = mPhotoView.getMaxHeight();
+                int width = mPhotoView.getMaxWidth();
+                Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), width, height);
+                mPhotoView.setImageBitmap(bitmap);
+            }
+        });
+
         updatePhotoView();
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = getFragmentManager();
+                CrimePictureFragment picture =
+                        CrimePictureFragment.newInstance(mCrime.getPhotoFilename());
+                picture.show(fm, DIALOG_PHOTO);
+            }
+        });
 
         return v;
     }
