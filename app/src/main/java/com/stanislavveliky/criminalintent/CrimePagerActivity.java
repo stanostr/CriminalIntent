@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,17 +17,26 @@ import java.util.UUID;
  * Created by stan_ on 1/17/2018.
  */
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity
+        implements CrimeFragment.Callbacks
+{
 
     private static final String EXTRA_CRIME_ID = "com.stanislavveliky.criminalintent.crime_id";
+    private static final String TAG = "CrimePagerActivity";
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
+
 
     public static Intent newIntent(Context packageContext, UUID crimeId)
     {
         Intent intent = new Intent(packageContext, CrimePagerActivity.class);
         intent.putExtra(EXTRA_CRIME_ID, crimeId);
         return intent;
+    }
+
+    public void onCrimeUpdated(Crime crime)
+    {
+
     }
 
     @Override

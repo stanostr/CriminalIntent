@@ -2,6 +2,7 @@ package com.stanislavveliky.criminalintent;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -69,6 +70,7 @@ public class CrimeFragment extends Fragment {
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
     private Button mCallButton;
+    private Callbacks mCallbacks;
 
     public static CrimeFragment newInstance(UUID crimeId)
     {
@@ -77,6 +79,21 @@ public class CrimeFragment extends Fragment {
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    /**
+     * required interface for hosting activities
+     */
+    public interface Callbacks
+    {
+        void onCrimeUpdated(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
     }
 
     @Override
@@ -113,6 +130,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                updateCrime();
             }
 
             @Override
@@ -151,6 +169,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mCrime.setSolved(isChecked);
+                updateCrime();
             }
         });
 
@@ -236,6 +255,11 @@ public class CrimeFragment extends Fragment {
         return v;
     }
 
+    private void updateCrime() {
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated(mCrime);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -248,12 +272,14 @@ public class CrimeFragment extends Fragment {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
             updateDate();
+            updateCrime();
         }
         else if(requestCode == REQUEST_TIME)
         {
             Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
             mCrime.setDate(date);
             updateTime();
+            updateCrime();
         }
         else if (requestCode==REQUEST_CONTACT && data!=null)
         {
@@ -271,6 +297,7 @@ public class CrimeFragment extends Fragment {
                 String suspect = c.getString(0);
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
+                updateCrime();
 
             } finally {
                 c.close();
@@ -279,6 +306,7 @@ public class CrimeFragment extends Fragment {
         else if(requestCode == REQUEST_PHOTO)
         {
             updatePhotoView();
+            updateCrime();
         }
     }
 
@@ -292,6 +320,13 @@ public class CrimeFragment extends Fragment {
         {
             CrimeLab.get(getActivity()).deleteCrime(mCrime);
         }
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+        mCallbacks = null;
     }
 
     private void updateDate() {

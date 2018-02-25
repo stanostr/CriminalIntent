@@ -1,12 +1,16 @@
 package com.stanislavveliky.criminalintent;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 /**
  * Created by stan_ on 1/7/2018.
  */
 
-public class CrimeListActivity extends SingleFragmentActivity {
+public class CrimeListActivity extends SingleFragmentActivity
+        implements CrimeListFragment.Callbacks, CrimeFragment.Callbacks {
+    private static final String TAG = "CrimeListActivity";
     @Override
     protected Fragment createFragment()
     {
@@ -17,5 +21,29 @@ public class CrimeListActivity extends SingleFragmentActivity {
     protected int getLayoutResId()
     {
         return R.layout.activity_masterdetail;
+    }
+
+    @Override
+    public void onCrimeSelected(Crime crime)
+    {
+        if(findViewById(R.id.detail_fragment_container)==null)
+        {
+            Intent intent = CrimePagerActivity.newIntent(this, crime.getId());
+            startActivity(intent);
+        }
+        else {
+            Fragment newDetail = CrimeFragment.newInstance(crime.getId());
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detail_fragment_container, newDetail).commit();
+        }
+    }
+
+    @Override
+    public void onCrimeUpdated(Crime crime)
+    {
+        Log.d(TAG, "onCrimeUpdated() called");
+        CrimeListFragment listFragment = (CrimeListFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_container);
+        listFragment.updateUI();
     }
 }
